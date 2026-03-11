@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+
+<!-- 可爱图标 -->
+<link rel="apple-touch-icon" href="https://p5-flow-imagex-sign.byteimg.com/tos-cn-i-a9rns2rl98/7704aa1ad8044fdd84e47407076bad84.png">
+<link rel="icon" href="https://p5-flow-imagex-sign.byteimg.com/tos-cn-i-a9rns2rl98/7704aa1ad8044fdd84e47407076bad84.png">
+<meta name="apple-mobile-web-app-title" content="小任务">
+<meta name="apple-mobile-web-app-capable" content="yes">
+
+<title>小任务</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif}
+body{background:#f9fafb;padding:16px;max-width:480px;margin:0 auto}
+.header{background:#73d2b2;color:white;padding:18px;border-radius:20px;text-align:center;margin-bottom:16px;font-size:17px}
+.card{background:white;border-radius:18px;padding:16px;margin-bottom:12px;box-shadow:0 3px 10px rgba(0,0,0,0.03)}
+input,select{width:100%;padding:12px;border:1px solid #f0f0f0;border-radius:12px;margin-bottom:8px;font-size:15px}
+button{width:100%;background:#73d2b2;color:white;border:none;padding:14px;border-radius:12px;margin-top:4px;font-size:15px}
+.task-item{background:white;border-radius:16px;padding:14px;margin-bottom:8px;display:flex;align-items:center;gap:10px}
+.task-done{text-decoration:line-through;color:#999}
+.pri{padding:2px 6px;border-radius:4px;color:white;font-size:11px}
+.pri-h{background:#ff6b6b}
+.pri-m{background:#ffc145}
+.pri-l{background:#80d880}
+.del-btn{background:#ff6b6b;color:white;border:none;padding:6px 8px;border-radius:8px;font-size:12px}
+</style>
+</head>
+<body>
+
+<div class="header">🐾 小任务</div>
+
+<div class="card">
+  我的名字：<input id="user" value="小明">
+</div>
+<div class="card">
+  房间号：<input id="room" value="team1">
+</div>
+
+<div class="card">
+  任务：<input id="text" placeholder="输入任务">
+  指派给：<input id="assign" placeholder="输入成员名字">
+  优先级：
+  <select id="pri">
+    <option value="h">🔴 高</option>
+    <option value="m">🟡 中</option>
+    <option value="l">🟢 低</option>
+  </select>
+  提醒：<input type="datetime-local" id="rt">
+  <button onclick="addTask()">➕ 添加任务</button>
+</div>
+
+<div id="list"></div>
+
+<script>
+// 本地存储 + 手动刷新同步
+function getRoom() { return document.getElementById("room").value; }
+function loadTasks() {
+  let tasks = JSON.parse(localStorage.getItem("tasks_"+getRoom()) || "[]");
+  render(tasks);
+}
+function saveTasks(tasks) {
+  localStorage.setItem("tasks_"+getRoom(), JSON.stringify(tasks));
+  loadTasks();
+}
+
+function render(tasks) {
+  let html = "";
+  tasks.forEach((t, i) => {
+    let p = t.pri || "l";
+    html += `
+    <div class="task-item">
+      <input type="checkbox" ${t.done?"checked":""} onclick="toggle(${i})">
+      <div style="flex:1">
+        <div class="${t.done?"task-done":""}">${t.text}</div>
+        <div style="font-size:12px;color:#888;margin-top:4px;display:flex;gap:6px">
+          <span class="pri pri-${p}">${p=="h"?"高":p=="m"?"中":"低"}</span>
+          <span>指派：${t.assign||"无人"}</span>
+          ${t.rt?"<span>⏰"+t.rt+"</span>":""}
+        </div>
+      </div>
+      <button class="del-btn" onclick="del(${i})">删</button>
+    </div>`;
+  });
+  document.getElementById("list").innerHTML = html;
+}
+
+function addTask() {
+  let t = document.getElementById("text").value;
+  if (!t) return;
+  let tasks = JSON.parse(localStorage.getItem("tasks_"+getRoom()) || "[]");
+  tasks.push({
+    text: t,
+    assign: document.getElementById("assign").value,
+    pri: document.getElementById("pri").value,
+    rt: document.getElementById("rt").value,
+    done: false
+  });
+  document.getElementById("text").value = "";
+  document.getElementById("assign").value = "";
+  document.getElementById("rt").value = "";
+  saveTasks(tasks);
+}
+
+function toggle(i) {
+  let tasks = JSON.parse(localStorage.getItem("tasks_"+getRoom()) || "[]");
+  tasks[i].done = !tasks[i].done;
+  saveTasks(tasks);
+}
+
+function del(i) {
+  if (!confirm("确定删除？")) return;
+  let tasks = JSON.parse(localStorage.getItem("tasks_"+getRoom()) || "[]");
+  tasks.splice(i, 1);
+  saveTasks(tasks);
+}
+
+loadTasks();
+</script>
+</body>
+</html>
