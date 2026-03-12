@@ -53,41 +53,42 @@ button{
 }
 
 /* ============================== */
-/* 核心：小巧任务卡 + 横向舒展排版 */
+/* 核心：小巧任务卡 + 信息分层排版 */
 /* ============================== */
 .task{
   background:white;
-  padding:12px; /* 缩减内边距，卡片更小 */
+  padding:12px; /* 紧凑内边距 */
   border-radius:10px;
-  margin-bottom:6px; /* 减小卡片间距 */
+  margin-bottom:6px; /* 小间距适配多任务 */
   box-shadow:0 1px 2px rgba(0,0,0,0.04);
   display: grid;
-  grid-template-columns: 25px 1fr 50px; /* 更紧凑的三列布局 */
-  gap: 8px; /* 缩小元素间距 */
-  align-items: center; /* 垂直居中，更紧凑 */
+  grid-template-columns: 25px 1fr 50px; /* 紧凑三列 */
+  gap: 8px;
+  align-items: start; /* 顶部对齐更整洁 */
 }
 
-/* 勾选框 - 更小更精致 */
+/* 勾选框 - 小巧精致 */
 .task-checkbox{
   width:16px;
   height:16px;
   cursor: pointer;
+  margin-top:1px;
 }
 
-/* 任务内容区 - 核心排版 */
+/* 任务内容区 - 分层排版 */
 .task-content{
   width: 100%;
-  overflow: hidden; /* 防止内容溢出 */
+  overflow: hidden;
 }
 
-/* 任务标题 - 精简但清晰 */
+/* 任务标题 - 清晰醒目 */
 .task-text{
   font-size:15px;
   line-height:1.3;
-  margin-bottom:4px; /* 缩减标题和信息栏间距 */
-  white-space: nowrap; /* 单行显示，横向舒展 */
+  margin-bottom:4px;
+  white-space: nowrap;
   overflow: hidden;
-  text-overflow: ellipsis; /* 超长文字省略，不挤 */
+  text-overflow: ellipsis;
 }
 
 /* 完成任务样式 */
@@ -96,46 +97,41 @@ button{
   color:#999;
 }
 
-/* 信息栏 - 横向完全舒展，不挤团 */
-.task-info{
-  font-size:11px; /* 缩小字号但保证可读 */
+/* 第一层：创建/指派/优先级（横向舒展） */
+.task-meta{
+  font-size:11px;
   color:#666;
   display:flex;
-  flex-wrap: nowrap; /* 强制横向排列 */
-  gap:10px; /* 拉开信息间距，不挤 */
+  flex-wrap: nowrap;
+  gap:10px;
   align-items:center;
+  margin-bottom:3px; /* 与时间区拉开小间距 */
   overflow: hidden;
 }
 
-/* 优先级标签 - 小巧 */
+/* 优先级标签 */
 .pri{
   padding:1px 5px;
   border-radius:5px;
   color:white;
   font-size:10px;
-  flex-shrink:0; /* 不压缩 */
+  flex-shrink:0;
 }
 .pri-h{background:#FF5A5A;}
 .pri-m{background:#FFB946;}
 .pri-l{background:#73C6B6;}
 
-/* 截止时间 - 突出但不占空间 */
-.deadline{
+/* 第二层：截止时间（独立下放） */
+.task-deadline{
+  font-size:11px;
   color:#FF5A5A;
   font-weight:bold;
-  flex-shrink:0; /* 不压缩 */
   white-space: nowrap;
-}
-
-/* 创建/指派信息 - 横向舒展 */
-.task-meta{
-  flex-shrink:1; /* 可适度压缩，保证整体不挤 */
   overflow: hidden;
   text-overflow: ellipsis;
-  white-space: nowrap;
 }
 
-/* 删除按钮 - 最小化，不抢空间 */
+/* 删除按钮 - 最小化 */
 .del{
   width:45px;
   height:26px;
@@ -146,6 +142,7 @@ button{
   border-radius:5px;
   font-size:11px;
   flex-shrink:0;
+  align-self:center; /* 垂直居中更协调 */
 }
 </style>
 </head>
@@ -215,18 +212,18 @@ function render(tasks) {
       deadline = match[1].replace("T", " ");
     }
 
-    // 拼接任务卡片HTML（优化信息排版）
+    // 拼接任务卡片HTML（截止时间独立下放）
     html += `
     <div class="task">
       <input type="checkbox" class="task-checkbox" ${t.done?"checked":""} onclick="toggle(${t.id},${t.done})">
       <div class="task-content">
         <div class="task-text ${t.done?'task-done':''}">${cleanText}</div>
-        <div class="task-info">
+        <div class="task-meta">
           <span class="pri pri-${t.pri}">${t.pri=='h'?'高':t.pri=='m'?'中':'低'}</span>
-          <span class="task-meta">创建：${t.create_user}</span>
-          <span class="task-meta">指派：${t.assign_user||'无人'}</span>
-          ${deadline ? `<span class="deadline">⏰ ${deadline}</span>` : ""}
+          <span>创建：${t.create_user}</span>
+          <span>指派：${t.assign_user||'无人'}</span>
         </div>
+        ${deadline ? `<div class="task-deadline">⏰ 截止：${deadline}</div>` : ""}
       </div>
       <button class="del" onclick="del(${t.id})">删</button>
     </div>`;
