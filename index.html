@@ -10,106 +10,137 @@
 <title>🐾 小任务</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box;font-family:-apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif}
-body{background:#f9fafb;padding:20px;max-width:500px;margin:0 auto;color:#222;}
+body{background:#f9fafb;padding:15px;max-width:500px;margin:0 auto;color:#222;}
 
-/* 顶部标题 */
+/* 顶部标题 - 精简内边距 */
 .header{
   background:#73C6B6;
   color:white;
   text-align:center;
-  padding:22px;
+  padding:18px; /* 缩减内边距，更紧凑 */
   border-radius:22px;
-  margin-bottom:18px;
-  font-size:21px;
+  margin-bottom:15px;
+  font-size:19px;
   font-weight:bold;
 }
 
-/* 卡片 */
+/* 卡片 - 精简尺寸 */
 .card{
   background:#ffffff;
-  border-radius:20px;
-  padding:20px;
-  margin-bottom:14px;
-  box-shadow:0 3px 10px rgba(0,0,0,0.04);
+  border-radius:18px;
+  padding:16px; /* 缩减内边距 */
+  margin-bottom:12px;
+  box-shadow:0 2px 8px rgba(0,0,0,0.04);
 }
 
-/* 输入框 */
+/* 输入框 - 精简 */
 input,select{
   width:100%;
-  padding:13px;
+  padding:11px;
   border:1px solid #EAEAEA;
-  border-radius:14px;
-  margin:8px 0 12px;
-  font-size:15px;
+  border-radius:12px;
+  margin:6px 0 10px;
+  font-size:14px;
 }
 
-/* 按钮 */
+/* 按钮 - 精简 */
 button{
   width:100%;
   background:#73C6B6;
   color:white;
   border:none;
-  padding:16px;
-  border-radius:16px;
-  font-size:16px;
+  padding:14px;
+  border-radius:14px;
+  font-size:15px;
   font-weight:500;
 }
 
 /* ============================== */
-/* 任务样式：真正美观、整齐、不挤 */
+/* 核心优化：小巧任务卡 + 分层整齐排版 */
 /* ============================== */
 .task{
   background:#ffffff;
-  padding:18px;
-  border-radius:18px;
-  margin-bottom:12px;
+  padding:14px; /* 大幅缩减内边距，卡片更小 */
+  border-radius:16px;
+  margin-bottom:8px; /* 减小卡片间距，多任务不拥挤 */
   display:flex;
   align-items:flex-start;
-  gap:14px;
-  box-shadow:0 2px 8px rgba(0,0,0,0.03);
+  gap:10px; /* 缩小元素间距 */
+  box-shadow:0 2px 6px rgba(0,0,0,0.03);
 }
 .task-content{
   flex:1;
+  overflow:hidden; /* 防止内容溢出 */
 }
 .task-text{
-  font-size:17px;
+  font-size:16px; /* 精简字号 */
   font-weight:500;
-  line-height:1.4;
-  margin-bottom:10px;
+  line-height:1.3;
+  margin-bottom:6px; /* 缩小标题与信息间距 */
+  white-space:nowrap; /* 单行显示，不换行拥挤 */
+  overflow:hidden;
+  text-overflow:ellipsis; /* 超长文字省略 */
 }
 .task-done{
   text-decoration:line-through;
   color:#999;
 }
-.task-info{
+
+/* 第一层：优先级+创建+指派（横向整齐） */
+.task-meta{
   display:flex;
-  flex-wrap:wrap;
-  gap:10px;
-  font-size:12px;
+  flex-wrap:nowrap; /* 强制横向，不换行 */
+  gap:8px; /* 均匀间距，更整齐 */
+  font-size:11px; /* 精简字号 */
   color:#777;
   align-items:center;
+  margin-bottom:4px; /* 与时间区拉开小间距 */
+  overflow:hidden;
 }
 
-/* 优先级标签 */
-.pri{
-  padding:4px 9px;
-  border-radius:10px;
-  color:white;
+/* 第二层：截止时间（独立下放，整齐对齐） */
+.task-deadline{
   font-size:11px;
+  color:#FF5A5A; /* 红色突出，不刺眼 */
   font-weight:500;
+  padding-left:0; /* 和上一行对齐 */
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+
+/* 优先级标签 - 小巧精致 */
+.pri{
+  padding:2px 7px; /* 缩减内边距 */
+  border-radius:8px;
+  color:white;
+  font-size:10px;
+  font-weight:500;
+  flex-shrink:0; /* 不压缩，保证显示完整 */
 }
 .pri-h{background:#FF5A5A;}
 .pri-m{background:#FFB946;}
 .pri-l{background:#73C6B6;}
 
-/* 删除按钮 */
+/* 删除按钮 - 小巧不占空间 */
 .del{
   background:#FF5A5A;
   color:white;
   border:none;
-  padding:10px 12px;
-  border-radius:12px;
-  font-size:13px;
+  padding:8px 10px; /* 缩减尺寸 */
+  border-radius:10px;
+  font-size:12px;
+  width:auto; /* 取消100%宽度，仅适配内容 */
+  flex-shrink:0; /* 不压缩 */
+  align-self:center; /* 垂直居中，更协调 */
+}
+
+/* 勾选框 - 小巧精致 */
+.task-checkbox{
+  width:16px;
+  height:16px;
+  margin-top:1px;
+  cursor:pointer;
 }
 </style>
 </head>
@@ -134,7 +165,6 @@ button{
   指派给<br>
   <input id="assign" placeholder="选填"><br>
 
-  <!-- 时间选择框 100% 显示 -->
   截止时间<br>
   <input type="datetime-local" id="deadline"><br>
 
@@ -151,9 +181,7 @@ button{
 <div id="list"></div>
 
 <script>
-// ======================
-// 你的信息已填好
-// ======================
+// 接口配置
 const SUPABASE_URL = "https://dkxxrhdzedvdxbycwczd.supabase.co";
 const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRreHhyaGR6ZWR2ZHhieWN3Y3pkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzMyNzExMzgsImV4cCI6MjA4ODg0NzEzOH0.Od5jKG-y_8hQd-BvyalAJoencJPFCn9iRDptCn1foiE";
 
@@ -171,27 +199,49 @@ window.onload = () => {
 };
 
 async function load() {
-  let room = document.getElementById("room").value;
-  let r = await api("/tasks?room=eq."+room+"&order=id.desc");
-  render(await r.json());
+  try {
+    let room = document.getElementById("room").value;
+    let r = await api("/tasks?room=eq."+room+"&order=id.desc");
+    render(await r.json());
+  } catch (e) {
+    console.error("加载任务失败：", e);
+    // 无数据时显示提示
+    document.getElementById("list").innerHTML = '<div style="text-align:center; color:#999; padding:20px; font-size:14px;">暂无任务，发布一个吧～</div>';
+  }
 }
 
-// ==============================
-// 美化排版 + 时间一定显示
-// ==============================
+// 核心优化：拆分截止时间，分层排版
 function render(tasks) {
   let html = "";
+  if (tasks.length === 0) {
+    html = '<div style="text-align:center; color:#999; padding:20px; font-size:14px;">暂无任务，发布一个吧～</div>';
+    document.getElementById("list").innerHTML = html;
+    return;
+  }
+
   tasks.forEach(t => {
+    // 提取纯任务文本和截止时间
+    let taskText = t.text;
+    let deadline = "";
+    const deadlineMatch = t.text.match(/⏳ 截止：(.+)$/);
+    if (deadlineMatch) {
+      taskText = t.text.replace(/⏳ 截止：.+$/, "").trim(); // 去掉时间的纯任务名
+      deadline = deadlineMatch[1].replace("T", " "); // 格式化时间
+    }
+
     html += `
     <div class="task">
-      <input type="checkbox" ${t.done?"checked":""} onclick="toggle(${t.id},${t.done})">
+      <input type="checkbox" class="task-checkbox" ${t.done?"checked":""} onclick="toggle(${t.id},${t.done})">
       <div class="task-content">
-        <div class="task-text ${t.done?'task-done':''}">${t.text}</div>
-        <div class="task-info">
+        <div class="task-text ${t.done?'task-done':''}">${taskText}</div>
+        <!-- 第一层：优先级+创建+指派 -->
+        <div class="task-meta">
           <span class="pri pri-${t.pri}">${t.pri=='h'?'高':t.pri=='m'?'中':'低'}</span>
           <span>创建：${t.create_user}</span>
           <span>指派：${t.assign_user||'无人'}</span>
         </div>
+        <!-- 第二层：截止时间（独立下放，整齐对齐） -->
+        ${deadline ? `<div class="task-deadline">⏰ 截止：${deadline}</div>` : ""}
       </div>
       <button class="del" onclick="del(${t.id})">删</button>
     </div>`;
@@ -199,9 +249,7 @@ function render(tasks) {
   document.getElementById("list").innerHTML = html;
 }
 
-// ==============================
-// 发布任务 + 时间真实显示
-// ==============================
+// 发布任务
 async function add() {
   let me = document.getElementById("me").value;
   let text = document.getElementById("text").value;
@@ -209,40 +257,56 @@ async function add() {
 
   if (!me || !text) { alert("请填写名字和任务"); return; }
 
-  // 👇 时间直接写进任务，100% 显示
-  let final = text;
-  if (deadline) final = `${text}  ⏳ 截止：${deadline}`;
+  // 拼接任务文本（保留时间标记）
+  let finalText = text;
+  if (deadline) finalText = `${text.trim()}  ⏳ 截止：${deadline}`;
 
-  await api("/tasks", {
-    method: "POST",
-    body: JSON.stringify({
-      room: document.getElementById("room").value,
-      text: final,
-      create_user: me,
-      assign_user: document.getElementById("assign").value || "无人",
-      pri: document.getElementById("pri").value,
-      done: false
-    })
-  });
+  try {
+    await api("/tasks", {
+      method: "POST",
+      body: JSON.stringify({
+        room: document.getElementById("room").value,
+        text: finalText,
+        create_user: me,
+        assign_user: document.getElementById("assign").value || "无人",
+        pri: document.getElementById("pri").value,
+        done: false
+      })
+    });
 
-  document.getElementById("text").value = "";
-  document.getElementById("assign").value = "";
-  document.getElementById("deadline").value = "";
-  load();
+    // 清空输入框
+    document.getElementById("text").value = "";
+    document.getElementById("assign").value = "";
+    document.getElementById("deadline").value = "";
+    load();
+  } catch (e) {
+    console.error("发布任务失败：", e);
+    alert("发布失败，请重试～");
+  }
 }
 
+// 切换任务状态
 async function toggle(id, done) {
-  await api("/tasks?id=eq."+id, {
-    method: "PATCH",
-    body: JSON.stringify({ done: !done })
-  });
-  load();
+  try {
+    await api("/tasks?id=eq."+id, {
+      method: "PATCH",
+      body: JSON.stringify({ done: !done })
+    });
+    load();
+  } catch (e) {
+    alert("修改状态失败，请重试～");
+  }
 }
 
+// 删除任务
 async function del(id) {
   if (!confirm("确定删除？")) return;
-  await api("/tasks?id=eq."+id, { method: "DELETE" });
-  load();
+  try {
+    await api("/tasks?id=eq."+id, { method: "DELETE" });
+    load();
+  } catch (e) {
+    alert("删除失败，请重试～");
+  }
 }
 </script>
 </body>
