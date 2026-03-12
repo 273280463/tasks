@@ -9,132 +9,151 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <title>🐾 小任务</title>
 <style>
-*{margin:0;padding:0;box-sizing:border-box;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
-body{background:#f7f8fc;padding:18px;max-width:500px;margin:0 auto;color:#333}
+*{margin:0;padding:0;box-sizing:border-box;font-family:-apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif}
+body{background:#f9fafb;padding:20px;max-width:500px;margin:0 auto;color:#222;}
 
 /* 顶部标题 */
 .header{
-  background:#82d9b9;
+  background:#73C6B6;
   color:white;
   text-align:center;
-  padding:20px;
-  border-radius:20px;
-  margin-bottom:16px;
-  font-size:20px;
+  padding:22px;
+  border-radius:22px;
+  margin-bottom:18px;
+  font-size:21px;
   font-weight:bold;
 }
 
 /* 卡片 */
 .card{
-  background:white;
-  border-radius:18px;
-  padding:18px;
-  margin-bottom:12px;
-  box-shadow:0 2px 12px rgba(0,0,0,0.04);
+  background:#ffffff;
+  border-radius:20px;
+  padding:20px;
+  margin-bottom:14px;
+  box-shadow:0 3px 10px rgba(0,0,0,0.04);
 }
 
 /* 输入框 */
 input,select{
   width:100%;
-  padding:12px;
-  border:1px solid #eee;
-  border-radius:12px;
-  margin:8px 0;
+  padding:13px;
+  border:1px solid #EAEAEA;
+  border-radius:14px;
+  margin:8px 0 12px;
   font-size:15px;
 }
 
 /* 按钮 */
 button{
   width:100%;
-  background:#82d9b9;
+  background:#73C6B6;
   color:white;
   border:none;
-  padding:14px;
-  border-radius:14px;
-  margin-top:6px;
+  padding:16px;
+  border-radius:16px;
   font-size:16px;
   font-weight:500;
 }
 
-/* 任务样式 —— 真正好看、整齐、不挤 */
+/* ============================== */
+/* 任务样式：真正美观、整齐、不挤 */
+/* ============================== */
 .task{
-  background:white;
-  padding:16px;
-  border-radius:16px;
-  margin-bottom:10px;
+  background:#ffffff;
+  padding:18px;
+  border-radius:18px;
+  margin-bottom:12px;
   display:flex;
-  align-items:center;
-  gap:12px;
-  box-shadow:0 1px 4px rgba(0,0,0,0.03);
+  align-items:flex-start;
+  gap:14px;
+  box-shadow:0 2px 8px rgba(0,0,0,0.03);
 }
-
-/* 任务内容 */
-.task-text{
+.task-content{
   flex:1;
-  font-size:16px;
+}
+.task-text{
+  font-size:17px;
+  font-weight:500;
   line-height:1.4;
+  margin-bottom:10px;
 }
 .task-done{
   text-decoration:line-through;
   color:#999;
 }
-
-/* 任务信息 */
 .task-info{
-  font-size:12px;
-  color:#888;
-  margin-top:6px;
   display:flex;
   flex-wrap:wrap;
-  gap:8px;
+  gap:10px;
+  font-size:12px;
+  color:#777;
   align-items:center;
 }
 
 /* 优先级标签 */
 .pri{
-  padding:3px 7px;
-  border-radius:8px;
+  padding:4px 9px;
+  border-radius:10px;
   color:white;
   font-size:11px;
+  font-weight:500;
 }
-.pri-h{background:#ff6b6b}
-.pri-m{background:#ffb442}
-.pri-l{background:#82d9b9}
+.pri-h{background:#FF5A5A;}
+.pri-m{background:#FFB946;}
+.pri-l{background:#73C6B6;}
 
 /* 删除按钮 */
 .del{
-  background:#ff6b6b;
+  background:#FF5A5A;
   color:white;
   border:none;
-  padding:8px 11px;
-  border-radius:10px;
+  padding:10px 12px;
+  border-radius:12px;
   font-size:13px;
 }
 </style>
 </head>
 <body>
 
-<div class="header">🐾 小任务 · 实时同步</div>
-
-<div class="card">我的名字<br><input id="me" oninput="localStorage.setItem('me',this.value)"></div>
-<div class="card">房间号<br><input id="room" value="team1"></div>
+<div class="header">🐾 小任务 · 时间管理</div>
 
 <div class="card">
-  任务内容<br><input id="text"><br>
-  指派给<br><input id="assign"><br>
-  截止时间<br><input type="datetime-local" id="deadline"><br>
+  我的名字<br>
+  <input id="me" oninput="localStorage.setItem('me',this.value)">
+</div>
+
+<div class="card">
+  房间号<br>
+  <input id="room" value="team1">
+</div>
+
+<div class="card">
+  任务内容<br>
+  <input id="text" placeholder="输入你要做的事"><br>
+
+  指派给<br>
+  <input id="assign" placeholder="选填"><br>
+
+  <!-- 时间选择框 100% 显示 -->
+  截止时间<br>
+  <input type="datetime-local" id="deadline"><br>
+
   优先级<br>
   <select id="pri">
-    <option value="h">高优先</option>
-    <option value="m">中优先</option>
-    <option value="l">低优先</option>
+    <option value="h">🔴 高优先</option>
+    <option value="m">🟡 中优先</option>
+    <option value="l">🟢 低优先</option>
   </select><br>
+
   <button onclick="add()">➕ 发布任务</button>
 </div>
 
 <div id="list"></div>
 
 <script>
+// ======================
+// 你的信息已填好
+// ======================
 const SUPABASE_URL = "https://dkxxrhdzedvdxbycwczd.supabase.co";
 const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRreHhyaGR6ZWR2ZHhieWN3Y3pkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzMyNzExMzgsImV4cCI6MjA4ODg0NzEzOH0.Od5jKG-y_8hQd-BvyalAJoencJPFCn9iRDptCn1foiE";
 
@@ -157,15 +176,17 @@ async function load() {
   render(await r.json());
 }
 
-// ========== 好看排版 + 时间显示 ==========
+// ==============================
+// 美化排版 + 时间一定显示
+// ==============================
 function render(tasks) {
   let html = "";
   tasks.forEach(t => {
     html += `
     <div class="task">
       <input type="checkbox" ${t.done?"checked":""} onclick="toggle(${t.id},${t.done})">
-      <div class="task-text">
-        <div ${t.done?'class="task-done"':''}>${t.text}</div>
+      <div class="task-content">
+        <div class="task-text ${t.done?'task-done':''}">${t.text}</div>
         <div class="task-info">
           <span class="pri pri-${t.pri}">${t.pri=='h'?'高':t.pri=='m'?'中':'低'}</span>
           <span>创建：${t.create_user}</span>
@@ -178,7 +199,9 @@ function render(tasks) {
   document.getElementById("list").innerHTML = html;
 }
 
-// ========== 发布任务 + 时间显示 ==========
+// ==============================
+// 发布任务 + 时间真实显示
+// ==============================
 async function add() {
   let me = document.getElementById("me").value;
   let text = document.getElementById("text").value;
@@ -186,18 +209,19 @@ async function add() {
 
   if (!me || !text) { alert("请填写名字和任务"); return; }
 
-  let showText = text;
-  if (deadline) showText = text + " ⏰ " + deadline;
+  // 👇 时间直接写进任务，100% 显示
+  let final = text;
+  if (deadline) final = `${text}  ⏳ 截止：${deadline}`;
 
   await api("/tasks", {
-    method:"POST",
-    body:JSON.stringify({
-      room:document.getElementById("room").value,
-      text:showText,
-      create_user:me,
-      assign_user:document.getElementById("assign").value||"无人",
-      pri:document.getElementById("pri").value,
-      done:false
+    method: "POST",
+    body: JSON.stringify({
+      room: document.getElementById("room").value,
+      text: final,
+      create_user: me,
+      assign_user: document.getElementById("assign").value || "无人",
+      pri: document.getElementById("pri").value,
+      done: false
     })
   });
 
@@ -209,15 +233,15 @@ async function add() {
 
 async function toggle(id, done) {
   await api("/tasks?id=eq."+id, {
-    method:"PATCH",
-    body:JSON.stringify({ done:!done })
+    method: "PATCH",
+    body: JSON.stringify({ done: !done })
   });
   load();
 }
 
 async function del(id) {
   if (!confirm("确定删除？")) return;
-  await api("/tasks?id=eq."+id, { method:"DELETE" });
+  await api("/tasks?id=eq."+id, { method: "DELETE" });
   load();
 }
 </script>
