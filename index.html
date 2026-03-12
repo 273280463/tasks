@@ -55,7 +55,7 @@ button{
   font-weight:500;
 }
 
-/* 任务样式：美观、整齐 */
+/* 任务样式：真正美观、整齐 */
 .task{
   background:#ffffff;
   padding:18px;
@@ -99,6 +99,12 @@ button{
 .pri-h{background:#FF5A5A;}
 .pri-m{background:#FFB946;}
 .pri-l{background:#73C6B6;}
+
+/* 时间标签 */
+.deadline-tag{
+  color:#FF5A5A;
+  font-weight:600;
+}
 
 /* 删除按钮 */
 .del{
@@ -171,27 +177,30 @@ async function load() {
 }
 
 // ==============================
-// 优化排版：时间和创建/指派放在同一行
+// 核心：自动识别并排版时间（兼容新旧任务）
 // ==============================
 function render(tasks) {
   let html = "";
   tasks.forEach(t => {
-    // 从任务文本中提取时间（如果有的话）
-    let text = t.text;
+    let displayText = t.text;
     let deadline = "";
-    const timeMatch = t.text.match(/ ⏳ 截止：(\S+)/);
-    if (timeMatch) {
-      text = t.text.replace(/ ⏳ 截止：\S+/, "");
-      deadline = timeMatch[1];
+
+    // 匹配两种时间格式：⏰ 或 ⏳ 或 原始 T 格式
+    const timePattern = /(?: ⏰| ⏳ 截止：)(\S+)/;
+    const match = t.text.match(timePattern);
+    if (match) {
+      displayText = t.text.replace(timePattern, "");
+      deadline = match[1].replace('T', ' '); // 去掉 T
     }
 
-    let deadlineHtml = deadline ? `<span>⏰ ${deadline.replace('T', ' ')}</span>` : "";
+    // 时间标签
+    const deadlineHtml = deadline ? `<span class="deadline-tag">⏰ ${deadline}</span>` : "";
 
     html += `
     <div class="task">
       <input type="checkbox" ${t.done?"checked":""} onclick="toggle(${t.id},${t.done})">
       <div class="task-content">
-        <div class="task-text ${t.done?'task-done':''}">${text}</div>
+        <div class="task-text ${t.done?'task-done':''}">${displayText}</div>
         <div class="task-info">
           <span class="pri pri-${t.pri}">${t.pri=='h'?'高':t.pri=='m'?'中':'低'}</span>
           <span>创建：${t.create_user}</span>
@@ -206,7 +215,7 @@ function render(tasks) {
 }
 
 // ==============================
-// 发布任务：格式化时间，去掉 T
+// 发布任务：时间格式化为 2026-03-13 00:22
 // ==============================
 async function add() {
   let me = document.getElementById("me").value;
@@ -217,9 +226,8 @@ async function add() {
 
   let finalText = text;
   if (deadline) {
-    // 把 T 替换成空格，变成 2026-03-13 00:22
-    let formattedDeadline = deadline.replace('T', ' ');
-    finalText = `${text} ⏳ 截止：${formattedDeadline}`;
+    let formatted = deadline.replace('T', ' ');
+    finalText = `${text} ⏳ 截止：${formatted}`;
   }
 
   await api("/tasks", {
