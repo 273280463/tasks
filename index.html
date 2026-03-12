@@ -3,29 +3,32 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+
+<!-- 可爱小狗图标 -->
 <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/1049/1049319.png">
 <link rel="icon" href="https://cdn-icons-png.flaticon.com/512/1049/1049319.png">
+
 <meta name="apple-mobile-web-app-title" content="小任务">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <title>🐾 小任务</title>
 <style>
-*{margin:0;padding:0;box-sizing:border-box;font-family:-apple-system, BlinkMacSystemFont, sans-serif}
-body{background:#f7f8fc;padding:16px;max-width:500px;margin:0 auto;color:#333;}
-.card{background:white;border-radius:18px;padding:16px;margin-bottom:12px;box-shadow:0 2px 8px rgba(0,0,0,0.05);}
-input,select{width:100%;padding:12px;border:1px solid #eee;border-radius:12px;margin-top:8px;font-size:15px;}
-button{width:100%;background:#82d9b9;color:white;border:none;padding:14px;border-radius:14px;margin-top:10px;font-size:16px;font-weight:500;}
-.del{background:#ff6b6b;padding:8px 10px;border-radius:10px;font-size:13px;}
-.task{display:flex;align-items:center;background:white;padding:14px;border-radius:14px;margin-bottom:10px;box-shadow:0 1px 4px rgba(0,0,0,0.04);gap:12px;}
-.task-info{flex:1;}
-.task-text{font-size:16px;font-weight:500;margin-bottom:4px;}
-.task-done .task-text{text-decoration:line-through;color:#999;}
-.info{font-size:12px;color:#888;display:flex;gap:8px;flex-wrap:wrap;align-items:center;}
-.pri{padding:3px 8px;border-radius:10px;font-size:11px;color:white;}
-.pri-h{background:#ff6b6b;}
-.pri-m{background:#ffb442;}
-.pri-l{background:#82d9b9;}
-.deadline{color:#ff6b6b;font-weight:600;}
-.header{text-align:center;font-size:20px;font-weight:bold;color:white;background:#82d9b9;padding:18px;border-radius:18px;margin-bottom:16px;}
+*{margin:0;padding:0;box-sizing:border-box;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+body{background:#f7f8fc;padding:16px;max-width:500px;margin:0 auto;color:#333}
+.card{background:#fff;border-radius:18px;padding:16px;margin-bottom:12px;box-shadow:0 2px 8px rgba(0,0,0,0.05)}
+input,select{width:100%;padding:12px;border:1px solid #eee;border-radius:12px;margin-top:8px;font-size:15px}
+button{width:100%;background:#82d9b9;color:#fff;border:none;padding:14px;border-radius:14px;margin-top:10px;font-size:16px}
+.del{background:#ff6b6b;padding:8px 10px;border-radius:10px;font-size:13px}
+.task{display:flex;align-items:center;background:#fff;padding:14px;border-radius:14px;margin-bottom:10px;gap:12px;box-shadow:0 1px 4px rgba(0,0,0,0.04)}
+.task-info{flex:1}
+.task-text{font-size:16px;font-weight:500;margin-bottom:4px}
+.task-done .task-text{text-decoration:line-through;color:#999}
+.info{font-size:12px;color:#888;display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.pri{padding:3px 8px;border-radius:10px;font-size:11px;color:#fff}
+.pri-h{background:#ff6b6b}
+.pri-m{background:#ffb442}
+.pri-l{background:#82d9b9}
+.deadline{color:#ff6b6b;font-weight:600}
+.header{text-align:center;font-size:20px;font-weight:bold;color:#fff;background:#82d9b9;padding:18px;border-radius:18px;margin-bottom:16px}
 </style>
 </head>
 <body>
@@ -44,17 +47,17 @@ button{width:100%;background:#82d9b9;color:white;border:none;padding:14px;border
 
 <div class="card">
   任务内容<br>
-  <input id="text" placeholder="请输入任务">
+  <input id="text" placeholder="请输入任务"><br>
   指派给<br>
-  <input id="assign" placeholder="可不填">
+  <input id="assign" placeholder="可不填"><br>
   截止时间<br>
-  <input type="datetime-local" id="deadline">
+  <input type="datetime-local" id="deadline"><br>
   优先级<br>
   <select id="pri">
     <option value="h">🔴 高优先</option>
     <option value="m">🟡 中优先</option>
     <option value="l">🟢 低优先</option>
-  </select>
+  </select><br>
   <button onclick="add()">➕ 发布任务</button>
 </div>
 
@@ -62,7 +65,7 @@ button{width:100%;background:#82d9b9;color:white;border:none;padding:14px;border
 
 <script>
 // ======================
-// 在这里填你的 SUPABASE 信息
+// 你的信息已自动填好
 // ======================
 const SUPABASE_URL = "https://dkxxrhdzedvdxbycwczd.supabase.co";
 const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRreHhyaGR6ZWR2ZHhieWN3Y3pkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzMyNzExMzgsImV4cCI6MjA4ODg0NzEzOH0.Od5jKG-y_8hQd-BvyalAJoencJPFCn9iRDptCn1foiE";
@@ -86,7 +89,7 @@ window.onload = () => {
 
 async function load() {
   let room = document.getElementById("room").value;
-  let res = await api("/tasks?room=eq." + room + "&order=created_at.desc");
+  let res = await api("/tasks?room=eq."+room+"&order=created_at.desc");
   render(await res.json());
 }
 
@@ -136,7 +139,7 @@ async function add() {
 }
 
 async function toggle(id, done) {
-  await api("/tasks?id=eq." + id, {
+  await api("/tasks?id=eq."+id, {
     method: "PATCH",
     body: JSON.stringify({ done: !done })
   });
@@ -145,11 +148,10 @@ async function toggle(id, done) {
 
 async function del(id) {
   if (!confirm("确定删除？")) return;
-  await api("/tasks?id=eq." + id, { method: "DELETE" });
+  await api("/tasks?id=eq."+id, { method: "DELETE" });
   load();
 }
 </script>
 
 </body>
 </html>
-
