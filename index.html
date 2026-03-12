@@ -4,7 +4,6 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
 
-<!-- 图标 -->
 <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/1049/1049319.png">
 <link rel="icon" href="https://cdn-icons-png.flaticon.com/512/1049/1049319.png">
 
@@ -12,38 +11,37 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <title>🐾 小任务</title>
 <style>
-*{margin:0;padding:0;box-sizing:border-box;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
-body{background:#f7f8fc;padding:16px;max-width:500px;margin:0 auto;color:#333}
+*{margin:0;padding:0;box-sizing:border-box;font-family:-apple-system, BlinkMacSystemFont, sans-serif}
+body{background:#f5f7fa;padding:15px;max-width:480px;margin:0 auto;}
 
 /* 顶部标题 */
 .header{
   background:#82d9b9;
-  color:white;
+  color:#fff;
   text-align:center;
-  padding:20px;
-  border-radius:20px;
-  margin-bottom:16px;
+  padding:18px;
+  border-radius:18px;
+  margin-bottom:12px;
   font-size:20px;
   font-weight:bold;
 }
 
 /* 卡片 */
 .card{
-  background:white;
-  border-radius:18px;
-  padding:18px;
+  background:#fff;
+  border-radius:16px;
+  padding:16px;
   margin-bottom:12px;
-  box-shadow:0 2px 8px rgba(0,0,0,0.04);
+  box-shadow:0 1px 4px rgba(0,0,0,0.05);
 }
 
 /* 输入框 */
-input,select{
+input, select{
   width:100%;
-  padding:12px;
+  padding:11px;
   border:1px solid #eee;
-  border-radius:12px;
-  margin-top:8px;
-  margin-bottom:8px;
+  border-radius:10px;
+  margin:6px 0 10px;
   font-size:15px;
 }
 
@@ -51,75 +49,66 @@ input,select{
 button{
   width:100%;
   background:#82d9b9;
-  color:white;
+  color:#fff;
   border:none;
   padding:14px;
-  border-radius:14px;
-  margin-top:8px;
+  border-radius:12px;
   font-size:16px;
   font-weight:500;
 }
 
-/* 任务样式（绝对对齐、好看） */
+/* 任务样式：清爽、对齐、好看 */
 .task{
-  background:white;
-  padding:16px;
-  border-radius:16px;
+  background:#fff;
+  padding:14px;
+  border-radius:14px;
   margin-bottom:10px;
   display:flex;
   align-items:center;
   gap:12px;
-  box-shadow:0 1px 4px rgba(0,0,0,0.03);
+  box-shadow:0 1px 3px rgba(0,0,0,0.04);
 }
 
 /* 任务内容 */
-.task-content{
-  flex:1;
-}
 .task-text{
+  flex:1;
   font-size:16px;
-  font-weight:500;
-  margin-bottom:6px;
+  line-height:1.4;
 }
 .task-done{
   text-decoration:line-through;
   color:#999;
 }
 
-/* 任务信息（优先级、创建人、时间） */
+/* 任务信息 */
 .task-info{
+  font-size:12px;
+  color:#888;
+  margin-top:4px;
   display:flex;
   flex-wrap:wrap;
   gap:6px;
-  font-size:12px;
-  color:#666;
   align-items:center;
 }
 
-/* 优先级标签 */
+/* 优先级 */
 .pri{
-  padding:3px 7px;
-  border-radius:8px;
-  color:white;
+  padding:2px 6px;
+  border-radius:6px;
+  color:#fff;
   font-size:11px;
 }
-.pri-h{background:#ff6b6b}
-.pri-m{background:#ffb442}
-.pri-l{background:#82d9b9}
-
-/* 截止时间 */
-.deadline{
-  color:#ff6b6b;
-  font-weight:600;
-}
+.pri-h{background:#ff6b6b;}
+.pri-m{background:#ffb442;}
+.pri-l{background:#82d9b9;}
 
 /* 删除按钮 */
 .del{
   background:#ff6b6b;
-  color:white;
+  color:#fff;
   border:none;
-  padding:8px 10px;
-  border-radius:10px;
+  padding:7px 9px;
+  border-radius:8px;
   font-size:13px;
 }
 </style>
@@ -140,21 +129,17 @@ button{
 
 <div class="card">
   任务内容<br>
-  <input id="text" placeholder="请输入任务"><br>
-
+  <input id="text"><br>
   指派给<br>
-  <input id="assign" placeholder="选填"><br>
-
+  <input id="assign"><br>
   截止时间<br>
   <input type="datetime-local" id="deadline"><br>
-
   优先级<br>
   <select id="pri">
-    <option value="h">🔴 高优先</option>
-    <option value="m">🟡 中优先</option>
-    <option value="l">🟢 低优先</option>
+    <option value="h">高优先</option>
+    <option value="m">中优先</option>
+    <option value="l">低优先</option>
   </select><br>
-
   <button onclick="add()">➕ 发布任务</button>
 </div>
 
@@ -165,7 +150,7 @@ button{
 // 你的信息已填好
 // ======================
 const SUPABASE_URL = "https://dkxxrhdzedvdxbycwczd.supabase.co";
-const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRreHhyaGR6ZWR2ZHhieWN3Y3pkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzMyNzExMzgsImV4cCI6MjA4ODg0NzEzOH0.Od5jKG-y_8d-BvyalAJoencJPFCn9iRDptCn1foiE";
+const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRreHhyaGR6ZWR2ZHhieWN3Y3pkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzMyNzExMzgsImV4cCI6MjA4ODg0NzEzOH0.Od5jKG-y_8hQd-BvyalAJoencJPFCn9iRDptCn1foiE";
 
 async function api(path, opts = {}) {
   return fetch(SUPABASE_URL + "/rest/v1" + path, {
@@ -186,28 +171,25 @@ window.onload = () => {
 
 async function load() {
   let room = document.getElementById("room").value;
-  let res = await api("/tasks?room=eq."+room+"&order=id.desc");
+  let res = await api("/tasks?room=eq." + room + "&order=id.desc");
   render(await res.json());
 }
 
 // ==============================
-// 美化 + 时间显示（完全兼容）
+// 最稳定的渲染：绝对显示、不报错
 // ==============================
 function render(tasks) {
   let html = "";
   tasks.forEach(t => {
-    let deadlineText = t.deadline ? `<span class="deadline">截止：${t.deadline}</span>` : "";
-
     html += `
     <div class="task">
-      <input type="checkbox" ${t.done?"checked":""} onclick="toggle(${t.id},${t.done})">
-      <div class="task-content">
-        <div class="task-text ${t.done?'task-done':''}">${t.text}</div>
+      <input type="checkbox" ${t.done ? "checked" : ""} onclick="toggle(${t.id}, ${t.done})">
+      <div class="task-text">
+        <div ${t.done ? 'class="task-done"' : ''}>${t.text}</div>
         <div class="task-info">
           <span class="pri pri-${t.pri}">${t.pri=='h'?'高':t.pri=='m'?'中':'低'}</span>
           <span>创建：${t.create_user}</span>
-          <span>指派：${t.assign_user||'无人'}</span>
-          ${deadlineText}
+          <span>指派：${t.assign_user || '无人'}</span>
         </div>
       </div>
       <button class="del" onclick="del(${t.id})">删</button>
@@ -217,25 +199,26 @@ function render(tasks) {
 }
 
 // ==============================
-// 发布任务（自带时间，不报错）
+// 最稳定发布：任务一定显示
 // ==============================
 async function add() {
   let me = document.getElementById("me").value;
   let text = document.getElementById("text").value;
+  let deadline = document.getElementById("deadline").value;
+
   if (!me || !text) { alert("请填写名字和任务"); return; }
 
-  // 👇 重点：把时间存在任务文字里，不碰数据库结构，100%成功
-  let deadline = document.getElementById("deadline").value;
-  let finalText = text;
+  // 把时间直接写在任务里，100%成功、不碰数据库
+  let showText = text;
   if (deadline) {
-    finalText = text + "（截止：" + deadline + "）";
+    showText = text + " ⏰ " + deadline;
   }
 
   await api("/tasks", {
     method: "POST",
     body: JSON.stringify({
       room: document.getElementById("room").value,
-      text: finalText,
+      text: showText,
       create_user: me,
       assign_user: document.getElementById("assign").value || "无人",
       pri: document.getElementById("pri").value,
