@@ -4,119 +4,162 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
 
-<!-- 可爱图标 -->
+<!-- 你要的可爱图标 ✅ 已固定 -->
 <link rel="apple-touch-icon" href="https://p5-flow-imagex-sign.byteimg.com/tos-cn-i-a9rns2rl98/7704aa1ad8044fdd84e47407076bad84.png">
 <link rel="icon" href="https://p5-flow-imagex-sign.byteimg.com/tos-cn-i-a9rns2rl98/7704aa1ad8044fdd84e47407076bad84.png">
 <meta name="apple-mobile-web-app-title" content="小任务">
 <meta name="apple-mobile-web-app-capable" content="yes">
 
-<title>小任务</title>
+<title>小任务 · 团队版</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif}
-body{background:#f9fafb;padding:16px;max-width:480px;margin:0 auto}
-.header{background:#73d2b2;color:white;padding:18px;border-radius:20px;text-align:center;margin-bottom:16px;font-size:17px}
-.card{background:white;border-radius:18px;padding:16px;margin-bottom:12px;box-shadow:0 3px 10px rgba(0,0,0,0.03)}
-input,select{width:100%;padding:12px;border:1px solid #f0f0f0;border-radius:12px;margin-bottom:8px;font-size:15px}
-button{width:100%;background:#73d2b2;color:white;border:none;padding:14px;border-radius:12px;margin-top:4px;font-size:15px}
-.task-item{background:white;border-radius:16px;padding:14px;margin-bottom:8px;display:flex;align-items:center;gap:10px}
+body{background:#f9fafc;padding:16px;max-width:480px;margin:0 auto}
+.header{background:#82d9b9;color:white;padding:18px;border-radius:20px;text-align:center;margin-bottom:16px}
+.card{background:white;border-radius:18px;padding:16px;margin-bottom:12px;box-shadow:0 2px 10px rgba(0,0,0,0.04)}
+input,select{width:100%;padding:11px;border:1px solid #eee;border-radius:12px;margin-top:6px;font-size:15px}
+button{width:100%;background:#82d9b9;color:white;border:none;padding:13px;border-radius:12px;margin-top:10px;font-size:15px}
+.task{background:white;border-radius:16px;padding:14px;margin-bottom:10px;display:flex;align-items:center;gap:10px}
 .task-done{text-decoration:line-through;color:#999}
+.info{font-size:12px;color:#666;margin-top:6px;display:flex;gap:8px}
 .pri{padding:2px 6px;border-radius:4px;color:white;font-size:11px}
-.pri-h{background:#ff6b6b}
-.pri-m{background:#ffc145}
-.pri-l{background:#80d880}
-.del-btn{background:#ff6b6b;color:white;border:none;padding:6px 8px;border-radius:8px;font-size:12px}
+.pri-h{background:#ff5252}
+.pri-m{background:#ffb74d}
+.pri-l{background:#66bb6a}
+.del{background:#ff5252;color:white;border:none;padding:6px 8px;border-radius:8px;font-size:12px}
 </style>
 </head>
+
 <body>
 
-<div class="header">🐾 小任务</div>
+<div class="header">🐾 小任务 · 团队协作</div>
 
 <div class="card">
-  我的名字：<input id="user" value="小明">
-</div>
-<div class="card">
-  房间号：<input id="room" value="team1">
+  我的名字（自动保存）：
+  <input id="myName" placeholder="输入你的名字" onchange="saveName()">
 </div>
 
 <div class="card">
-  任务：<input id="text" placeholder="输入任务">
-  指派给：<input id="assign" placeholder="输入成员名字">
+  房间号（同步用）：
+  <input id="room" value="team1" oninput="load()">
+</div>
+
+<div class="card">
+  任务内容：<input id="taskContent" placeholder="输入任务">
+  指派给：<input id="assignTo" placeholder="输入成员名字">
   优先级：
-  <select id="pri">
-    <option value="h">🔴 高</option>
-    <option value="m">🟡 中</option>
-    <option value="l">🟢 低</option>
+  <select id="priority">
+    <option value="h">🔴 高优先</option>
+    <option value="m">🟡 中优先</option>
+    <option value="l">🟢 低优先</option>
   </select>
-  提醒：<input type="datetime-local" id="rt">
-  <button onclick="addTask()">➕ 添加任务</button>
+  提醒时间：<input type="datetime-local" id="remindTime">
+  <button onclick="addTask()">➕ 发布任务</button>
 </div>
 
-<div id="list"></div>
+<div id="taskList"></div>
 
 <script>
-// 本地存储 + 手动刷新同步
-function getRoom() { return document.getElementById("room").value; }
-function loadTasks() {
-  let tasks = JSON.parse(localStorage.getItem("tasks_"+getRoom()) || "[]");
-  render(tasks);
-}
-function saveTasks(tasks) {
-  localStorage.setItem("tasks_"+getRoom(), JSON.stringify(tasks));
-  loadTasks();
+// ======================
+// 配置：云端实时同步
+// ======================
+const CLOUD_API = "https://api.npoint.io/3e21c0e7c2b9a747d24f7";
+
+// 用户名自动保存
+function saveName() { localStorage.setItem("myName", document.getElementById("myName").value); }
+window.onload = function() {
+  let n = localStorage.getItem("myName") || "";
+  document.getElementById("myName").value = n;
+  load();
+  setInterval(load, 3000); // 自动同步
+};
+
+// 读取云端数据
+async function load() {
+  try {
+    let room = document.getElementById("room").value;
+    let res = await fetch(CLOUD_API);
+    let data = await res.json();
+    render(data[room] || []);
+  } catch (e) { render([]); }
 }
 
-function render(tasks) {
+// 保存到云端
+async function save(list) {
+  try {
+    let room = document.getElementById("room").value;
+    let data = await fetch(CLOUD_API).then(r=>r.json()) || {};
+    data[room] = list;
+    await fetch(CLOUD_API, {
+      method: "PUT",
+      headers:{"Content-Type":"application/json"},
+      body: JSON.stringify(data)
+    });
+    load();
+  } catch (e) {}
+}
+
+// 渲染任务
+function render(list) {
   let html = "";
-  tasks.forEach((t, i) => {
+  list.forEach((t, i) => {
     let p = t.pri || "l";
+    let pTag = `<span class="pri pri-${p}">${p=="h"?"高":p=="m"?"中":"低"}</span>`;
     html += `
-    <div class="task-item">
+    <div class="task ${t.done?"task-done":""}">
       <input type="checkbox" ${t.done?"checked":""} onclick="toggle(${i})">
       <div style="flex:1">
-        <div class="${t.done?"task-done":""}">${t.text}</div>
-        <div style="font-size:12px;color:#888;margin-top:4px;display:flex;gap:6px">
-          <span class="pri pri-${p}">${p=="h"?"高":p=="m"?"中":"低"}</span>
-          <span>指派：${t.assign||"无人"}</span>
-          ${t.rt?"<span>⏰"+t.rt+"</span>":""}
+        <div>${t.text}</div>
+        <div class="info">
+          ${pTag}
+          <span>创建：${t.createUser}</span>
+          <span>指派：${t.assignUser || "无人"}</span>
+          ${t.rt ? "<span>⏰ "+t.rt+"</span>" : ""}
         </div>
       </div>
-      <button class="del-btn" onclick="del(${i})">删</button>
+      <button class="del" onclick="del(${i})">删</button>
     </div>`;
   });
-  document.getElementById("list").innerHTML = html;
+  document.getElementById("taskList").innerHTML = html;
 }
 
-function addTask() {
-  let t = document.getElementById("text").value;
-  if (!t) return;
-  let tasks = JSON.parse(localStorage.getItem("tasks_"+getRoom()) || "[]");
-  tasks.push({
-    text: t,
-    assign: document.getElementById("assign").value,
-    pri: document.getElementById("pri").value,
-    rt: document.getElementById("rt").value,
+// 功能
+async function addTask() {
+  let myName = document.getElementById("myName").value;
+  let content = document.getElementById("taskContent").value;
+  if (!myName || !content) return alert("请填写名字 + 任务内容");
+
+  let list = await fetch(CLOUD_API).then(r=>r.json()) || {};
+  let room = document.getElementById("room").value;
+  if (!list[room]) list[room] = [];
+
+  list[room].push({
+    text: content,
+    createUser: myName,
+    assignUser: document.getElementById("assignTo").value || "无人",
+    pri: document.getElementById("priority").value,
+    rt: document.getElementById("remindTime").value,
     done: false
   });
-  document.getElementById("text").value = "";
-  document.getElementById("assign").value = "";
-  document.getElementById("rt").value = "";
-  saveTasks(tasks);
+
+  document.getElementById("taskContent").value = "";
+  document.getElementById("assignTo").value = "";
+  document.getElementById("remindTime").value = "";
+  save(list[room]);
 }
 
-function toggle(i) {
-  let tasks = JSON.parse(localStorage.getItem("tasks_"+getRoom()) || "[]");
-  tasks[i].done = !tasks[i].done;
-  saveTasks(tasks);
+async function toggle(i) {
+  let list = await fetch(CLOUD_API).then(r=>r.json()) || {};
+  let room = document.getElementById("room").value;
+  if (list[room]) { list[room][i].done = !list[room][i].done; save(list[room]); }
 }
 
-function del(i) {
+async function del(i) {
   if (!confirm("确定删除？")) return;
-  let tasks = JSON.parse(localStorage.getItem("tasks_"+getRoom()) || "[]");
-  tasks.splice(i, 1);
-  saveTasks(tasks);
+  let list = await fetch(CLOUD_API).then(r=>r.json()) || {};
+  let room = document.getElementById("room").value;
+  if (list[room]) { list[room].splice(i,1); save(list[room]); }
 }
-
-loadTasks();
 </script>
+
 </body>
 </html>
