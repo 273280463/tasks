@@ -4,159 +4,142 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
 
+<!-- ✅ 我们约定好的可爱图标 -->
 <link rel="apple-touch-icon" href="https://p5-flow-imagex-sign.byteimg.com/tos-cn-i-a9rns2rl98/7704aa1ad8044fdd84e47407076bad84.png">
+<link rel="icon" href="https://p5-flow-imagex-sign.byteimg.com/tos-cn-i-a9rns2rl98/7704aa1ad8044fdd84e47407076bad84.png">
+
 <meta name="apple-mobile-web-app-title" content="小任务">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<title>🐾 小任务 - 实时同步</title>
+<title>🐾 小任务</title>
 <style>
-*{margin:0;padding:0;box-sizing:border-box;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+*{margin:0;padding:0;box-sizing:border-box;font-family:-apple-system,BlinkMacFont,"Segoe UI",sans-serif}
 body{background:#f9fafc;padding:16px;max-width:480px;margin:0 auto}
 .header{background:#82d9b9;color:white;padding:18px;border-radius:20px;text-align:center;margin-bottom:16px}
-.card{background:white;border-radius:18px;padding:16px;margin-bottom:12px;box-shadow:0 2px 10px rgba(0,0,0,0.04)}
-input,select{width:100%;padding:11px;border:1px solid #eee;border-radius:12px;margin-top:6px;font-size:15px}
-button{width:100%;background:#82d9b9;color:white;border:none;padding:13px;border-radius:12px;margin-top:10px;font-size:15px}
+.card{background:white;border-radius:18px;padding:16px;margin-bottom:12px}
+input,select{width:100%;padding:11px;border:1px solid #eee;border-radius:12px;margin-top:6px}
+button{width:100%;background:#82d9b9;color:white;border:none;padding:13px;border-radius:12px;margin-top:10px}
 .task{background:white;border-radius:16px;padding:14px;margin-bottom:10px;display:flex;align-items:center;gap:10px}
 .task-done{text-decoration:line-through;color:#999}
 .info{font-size:12px;color:#666;margin-top:6px;display:flex;gap:8px}
-.pri{padding:2px 6px;border-radius:4px;color:white;font-size:11px}
-.pri-h{background:#ff5252}
-.pri-m{background:#ffb74d}
-.pri-l{background:#66bb6a}
-.del{background:#ff5252;color:white;border:none;padding:6px 8px;border-radius:8px;font-size:12px}
+.pri{padding:2px 6px;border-radius:4px;color:white}
+.pri-h{background:red}
+.pri-m{background:orange}
+.pri-l{background:green}
+.del{background:red;color:white;border:none;padding:6px 8px;border-radius:8px}
 </style>
 </head>
-
 <body>
 
-<div class="header">🐾 小任务 · 全员实时同步</div>
+<div class="header">🐾 小任务 · 实时同步</div>
 
 <div class="card">
-  我的名字（自动保存）：
-  <input id="myName" oninput="localStorage.setItem('myName',this.value)">
+  我的名字：<input id="me" oninput="localStorage.setItem('me',this.value)">
 </div>
 
 <div class="card">
-  房间号（全员统一即可同步）：
-  <input id="room" value="my-team-room">
+  房间号：<input id="room" value="team1">
 </div>
 
 <div class="card">
-  任务内容：<input id="taskContent">
-  指派给：<input id="assignTo">
+  任务：<input id="text"><br>
+  指派：<input id="assign"><br>
   优先级：
   <select id="pri">
-    <option value="h">🔴 高优先</option>
-    <option value="m">🟡 中优先</option>
-    <option value="l">🟢 低优先</option>
+    <option value="h">高</option>
+    <option value="m">中</option>
+    <option value="l">低</option>
   </select>
-  提醒时间：<input type="datetime-local" id="rt">
-  <button onclick="addTask()">➕ 发布任务</button>
+  <button onclick="add()">➕ 发布任务</button>
 </div>
 
-<div id="taskList"></div>
+<div id="list"></div>
 
 <script>
-// ==============================
-// 真实云端同步（电脑手机互通）
-// ==============================
-const SYNC_URL = "https://api.npoint.io/85b3e8b7c2d8e1f9a0b2";
+// ======================
+// 这里 保留你自己的 SUPABASE 信息！！！
+// ======================
+const SUPABASE_URL = "https://dkxxrhdzedvdxbycwczd.supabase.co";
+const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRreHhyaGR6ZWR2ZHhieWN3Y3pkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzMyNzExMzgsImV4cCI6MjA4ODg0NzEzOH0.Od5jKG-y_8hQd-BvyalAJoencJPFCn9iRDptCn1foiE";
 
-window.onload = function() {
-  document.getElementById("myName").value = localStorage.getItem("myName") || "";
-  loadData();
-  setInterval(loadData, 3000); // 自动同步
+async function api(path, opts = {}) {
+  return fetch(SUPABASE_URL + "/rest/v1" + path, {
+    headers: {
+      apikey: SUPABASE_KEY,
+      Authorization: "Bearer " + SUPABASE_KEY,
+      "Content-Type": "application/json"
+    },
+    ...opts
+  });
+}
+
+window.onload = () => {
+  document.getElementById("me").value = localStorage.getItem("me") || "";
+  load();
+  setInterval(load, 3000);
 };
 
-// 读取数据
-async function loadData() {
-  try {
-    let res = await fetch(SYNC_URL);
-    let json = await res.json();
-    let room = document.getElementById("room").value;
-    render(json[room] || []);
-  } catch (e) { render([]); }
+async function load() {
+  let room = document.getElementById("room").value;
+  let res = await api("/tasks?room=eq." + room);
+  render(await res.json());
 }
 
-// 保存数据
-async function saveData(tasks) {
-  try {
-    let res = await fetch(SYNC_URL);
-    let json = await res.json();
-    let room = document.getElementById("room").value;
-    json[room] = tasks;
-    await fetch(SYNC_URL, {
-      method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(json)
-    });
-    loadData();
-  } catch (e) {}
-}
-
-// 渲染任务
 function render(tasks) {
   let html = "";
-  tasks.forEach((t, i) => {
+  tasks.forEach(t => {
     html += `
     <div class="task ${t.done ? 'task-done' : ''}">
-      <input type="checkbox" ${t.done ? "checked" : ""} onclick="toggle(${i})">
+      <input type="checkbox" ${t.done ? "checked" : ""} onclick="toggle(${t.id}, ${t.done})">
       <div style="flex:1">
         <div>${t.text}</div>
         <div class="info">
           <span class="pri pri-${t.pri}">${t.pri == 'h' ? '高' : t.pri == 'm' ? '中' : '低'}</span>
-          <span>创建：${t.createUser}</span>
-          <span>指派：${t.assignUser}</span>
-          ${t.rt ? '<span>⏰ ' + t.rt + '</span>' : ''}
+          <span>创建：${t.create_user}</span>
+          <span>指派：${t.assign_user}</span>
         </div>
       </div>
-      <button class="del" onclick="del(${i})">删</button>
+      <button class="del" onclick="del(${t.id})">删</button>
     </div>`;
   });
-  document.getElementById("taskList").innerHTML = html;
+  document.getElementById("list").innerHTML = html;
 }
 
-// 功能
-async function addTask() {
-  let name = document.getElementById("myName").value;
-  let text = document.getElementById("taskContent").value;
-  if (!name || !text) return alert("请填写名字和任务");
+async function add() {
+  let me = document.getElementById("me").value;
+  let text = document.getElementById("text").value;
+  if (!me || !text) return alert("请填写名字和任务");
 
-  let res = await fetch(SYNC_URL);
-  let json = await res.json();
-  let room = document.getElementById("room").value;
-  if (!json[room]) json[room] = [];
-
-  json[room].push({
-    text: text,
-    createUser: name,
-    assignUser: document.getElementById("assignTo").value || "无人",
-    pri: document.getElementById("pri").value,
-    rt: document.getElementById("rt").value,
-    done: false
+  await api("/tasks", {
+    method: "POST",
+    body: JSON.stringify({
+      room: document.getElementById("room").value,
+      text: text,
+      create_user: me,
+      assign_user: document.getElementById("assign").value || "无人",
+      pri: document.getElementById("pri").value,
+      done: false
+    })
   });
 
-  document.getElementById("taskContent").value = "";
-  document.getElementById("assignTo").value = "";
-  document.getElementById("rt").value = "";
-  saveData(json[room]);
+  document.getElementById("text").value = "";
+  document.getElementById("assign").value = "";
+  load();
 }
 
-async function toggle(i) {
-  let res = await fetch(SYNC_URL);
-  let json = await res.json();
-  let room = document.getElementById("room").value;
-  json[room][i].done = !json[room][i].done;
-  saveData(json[room]);
+async function toggle(id, done) {
+  await api("/tasks?id=eq." + id, {
+    method: "PATCH",
+    body: JSON.stringify({ done: !done })
+  });
+  load();
 }
 
-async function del(i) {
+async function del(id) {
   if (!confirm("确定删除？")) return;
-  let res = await fetch(SYNC_URL);
-  let json = await res.json();
-  let room = document.getElementById("room").value;
-  json[room].splice(i, 1);
-  saveData(json[room]);
+  await api("/tasks?id=eq." + id, { method: "DELETE" });
+  load();
 }
 </script>
+
 </body>
 </html>
