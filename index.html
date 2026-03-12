@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
 <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/1049/1049319.png">
-<link rel="icon" href="https://cdn-icons-png.flaticon.com/512/1049/1049319.png">
+<link rel="icon" href="https://cdn-icons-png.flaticon.com/512/1049319.png">
 <meta name="apple-mobile-web-app-title" content="小任务">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <title>🐾 小任务</title>
@@ -55,9 +55,7 @@ button{
   font-weight:500;
 }
 
-/* ============================== */
-/* 任务样式：真正美观、整齐、不挤 */
-/* ============================== */
+/* 任务样式：美观、整齐 */
 .task{
   background:#ffffff;
   padding:18px;
@@ -134,7 +132,6 @@ button{
   指派给<br>
   <input id="assign" placeholder="选填"><br>
 
-  <!-- 时间选择框 100% 显示 -->
   截止时间<br>
   <input type="datetime-local" id="deadline"><br>
 
@@ -151,9 +148,6 @@ button{
 <div id="list"></div>
 
 <script>
-// ======================
-// 你的信息已填好
-// ======================
 const SUPABASE_URL = "https://dkxxrhdzedvdxbycwczd.supabase.co";
 const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRreHhyaGR6ZWR2ZHhieWN3Y3pkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzMyNzExMzgsImV4cCI6MjA4ODg0NzEzOH0.Od5jKG-y_8hQd-BvyalAJoencJPFCn9iRDptCn1foiE";
 
@@ -177,20 +171,32 @@ async function load() {
 }
 
 // ==============================
-// 美化排版 + 时间一定显示
+// 优化排版：时间和创建/指派放在同一行
 // ==============================
 function render(tasks) {
   let html = "";
   tasks.forEach(t => {
+    // 从任务文本中提取时间（如果有的话）
+    let text = t.text;
+    let deadline = "";
+    const timeMatch = t.text.match(/ ⏳ 截止：(\S+)/);
+    if (timeMatch) {
+      text = t.text.replace(/ ⏳ 截止：\S+/, "");
+      deadline = timeMatch[1];
+    }
+
+    let deadlineHtml = deadline ? `<span>⏰ ${deadline.replace('T', ' ')}</span>` : "";
+
     html += `
     <div class="task">
       <input type="checkbox" ${t.done?"checked":""} onclick="toggle(${t.id},${t.done})">
       <div class="task-content">
-        <div class="task-text ${t.done?'task-done':''}">${t.text}</div>
+        <div class="task-text ${t.done?'task-done':''}">${text}</div>
         <div class="task-info">
           <span class="pri pri-${t.pri}">${t.pri=='h'?'高':t.pri=='m'?'中':'低'}</span>
           <span>创建：${t.create_user}</span>
           <span>指派：${t.assign_user||'无人'}</span>
+          ${deadlineHtml}
         </div>
       </div>
       <button class="del" onclick="del(${t.id})">删</button>
@@ -200,7 +206,7 @@ function render(tasks) {
 }
 
 // ==============================
-// 发布任务 + 时间真实显示
+// 发布任务：格式化时间，去掉 T
 // ==============================
 async function add() {
   let me = document.getElementById("me").value;
@@ -209,15 +215,18 @@ async function add() {
 
   if (!me || !text) { alert("请填写名字和任务"); return; }
 
-  // 👇 时间直接写进任务，100% 显示
-  let final = text;
-  if (deadline) final = `${text}  ⏳ 截止：${deadline}`;
+  let finalText = text;
+  if (deadline) {
+    // 把 T 替换成空格，变成 2026-03-13 00:22
+    let formattedDeadline = deadline.replace('T', ' ');
+    finalText = `${text} ⏳ 截止：${formattedDeadline}`;
+  }
 
   await api("/tasks", {
     method: "POST",
     body: JSON.stringify({
       room: document.getElementById("room").value,
-      text: final,
+      text: finalText,
       create_user: me,
       assign_user: document.getElementById("assign").value || "无人",
       pri: document.getElementById("pri").value,
